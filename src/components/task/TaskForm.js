@@ -53,15 +53,14 @@ export default function TaskForm() {
         // edit or new task
         if(selectedtask === null) {
             // new task
-            task.projectId = actualProject.id
-            task.status = false
+            task.project = actualProject._id            
             addTask(task)
             
         } else {
             editTask(task)
         }
         
-        getTasks(actualProject.id)
+        getTasks(actualProject._id)
         setTask({name: ''})
 
 

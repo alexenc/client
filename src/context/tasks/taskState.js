@@ -1,40 +1,46 @@
 import { useContext, useReducer } from "react";
 import TaskContext from './taskContext'
 import TaskReducer from "./taskReducer";
-import { TASKS_PROJECT, ADD_TASK, VALIDATE_TASK, DELETE_TASK, STATUS_TASK, ACTUAL_TASK, EDIT_TASK } from "../../types";
-
+import { TASKS_PROJECT, ADD_TASK, VALIDATE_TASK, DELETE_TASK, ACTUAL_TASK, EDIT_TASK } from "../../types";
+import axiosClient from '../../config/axios'
 
 const TaskState = props => {
     const initialState = {
-        tasks: [
-            {id: 1, name: 'choose platform', status: true, projectId: 1 },
-            {id: 2,name: 'Design landing page', status: true, projectId: 2 },
-            {id: 3, name: 'Create products', status: false, projectId: 3 },
-            {id: 4, name: 'miau', status: false, projectId: 3 },
-            {id: 5, name: 'Design landing page 2', status: true, projectId: 2 },
-            {id: 6, name: 'Create products 2', status: false, projectId: 1 },
-            {id: 7, name: 'miau 2', status: false, projectId: 2 }
-        ],
-        tasksproject: null,
+        
+        tasksproject: [],
         taskerror: false,
         selectedtask: null
     }
 
     const [state, dispatch] = useReducer(TaskReducer, initialState)
 
-    const getTasks = projectId => {
-        dispatch({
-            type: TASKS_PROJECT,
-            payload: projectId
-        })
+    const getTasks = async project => {
+        console.log(project)
+        try {
+            const result = await axiosClient.get('/api/tasks', {params: {project}})         
+            console.log(result)       
+            dispatch({
+                type: TASKS_PROJECT,
+                payload: result.data.tasks
+                
+            })
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     //Add task to selected project
-    const addTask = task => {
-        dispatch({
-            type: ADD_TASK,
-            payload: task
-        })
+    const addTask = async task => {
+        try {
+            const result = await axiosClient.post('/api/tasks', task)
+            console.log(result)
+            dispatch({
+                type: ADD_TASK,
+                payload: task
+            })
+        } catch (error) {
+            
+        }
     }
 
     const validateTask = ()  => {
@@ -43,19 +49,20 @@ const TaskState = props => {
         })
     }
 
-    const deleteTask = taskId => {
-        dispatch({
-            type: DELETE_TASK,
-            payload: taskId
-        })
-    }
+    const deleteTask = async (id, project) => {
+        try {
 
-    const changeStatus = task => {
-        dispatch({
-            type: STATUS_TASK,
-            payload: task
-        })
+            await axiosClient.delete(`/api/tasks/${id}`, {params: {project}})
+
+            dispatch({
+                type: DELETE_TASK,
+                payload: id
+            })
+        } catch (error) {
+            console.log(error)
+        }
     }
+    
 
     const setActualTask = task => {
         dispatch({
@@ -64,25 +71,33 @@ const TaskState = props => {
         })
     }
 
-    const editTask = task => {
-        dispatch({
-            type: EDIT_TASK,
-            payload: task
-        })
+    const editTask = async task => {
+
+        console.log(task)
+
+        try {
+
+            const result = await axiosClient.put(`/api/tasks/${task._id}`, task)
+            console.log(result)
+            dispatch({
+                type: EDIT_TASK,
+                payload: task
+            })
+        } catch (error) {
+            console.log(error)
+        }   
     }
 
     return(
         <TaskContext.Provider
-            value={{
-                tasks: state.tasks,
+            value={{                
                 tasksproject: state.tasksproject,
                 taskerror: state.taskerror,
                 selectedtask: state.selectedtask,
                 getTasks,
                 addTask,
                 validateTask,
-                deleteTask,
-                changeStatus,
+                deleteTask,                
                 setActualTask,
                 editTask
             }}

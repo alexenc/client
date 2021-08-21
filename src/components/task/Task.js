@@ -1,12 +1,17 @@
 import React, { useContext } from 'react'
 import taskContext from '../../context/tasks/taskContext'
+import projectContext from '../../context/projects/projectContext'
 
 export default function Task({task}) {
 
-    const { deleteTask,  getTasks, changeStatus, setActualTask}= useContext(taskContext)
+    const { deleteTask,  getTasks, editTask, setActualTask}= useContext(taskContext)
+
+    const {project} = useContext(projectContext)
+    const [actualProject] = project
 
     const deleteTaskHandler = id => {
-        deleteTask(id)
+        deleteTask(id, actualProject._id)
+        
         getTasks(task.projectId)
     }
 
@@ -16,11 +21,12 @@ export default function Task({task}) {
         } else {
             task.status = true
         }
-        changeStatus(task)
+        editTask(task)
     }
 
     const selectTask = task => {
         setActualTask(task)
+        
     }
 
     return (
@@ -43,7 +49,7 @@ export default function Task({task}) {
                <button 
                 className="btn btn-secundario" 
                 type="button" 
-                onClick={() => deleteTaskHandler(task.id)} >Delete</button>
+                onClick={() => deleteTaskHandler(task._id)} >Delete</button>
            </div>
        </li>
     )

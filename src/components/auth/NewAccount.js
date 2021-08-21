@@ -1,7 +1,30 @@
-import { useState } from "react"
+import { useContext, useState, useEffect } from "react"
 import { Link } from "react-router-dom"
+import AlertContext from "../../context/alerts/alertContext"
+import AuthContext from "../../context/auth/authContext"
 
-export default function NewAccount() {
+
+
+export default function NewAccount(props) {
+
+    const alertContext = useContext(AlertContext)
+    const {alert, showAlert} = alertContext
+
+    const authContext = useContext(AuthContext)
+    const {registerUser, message, auth} = authContext
+
+    //user auth
+    useEffect(() => {
+        
+        if(auth) {
+            props.history.push('/projects')
+        }
+
+        if(message){
+            showAlert(message.msg, message.category)
+        }
+
+    }, [message, auth, props.history])
 
 
     //Sign up  state
@@ -28,20 +51,34 @@ export default function NewAccount() {
         e.preventDefault()
 
         //validation
-
+        if(name.trim() === '' || email.trim() === '' || password.trim() === '' || confirm.trim() === ''){
+            showAlert('All fields required', 'alerta-error')
+            return
+        }
 
         //min password 6 char
-
+        if(password.length < 6) {
+            showAlert('Password must have at least 6 characters', 'alerta-error')
+            return
+        }
 
         //match password
-
-
+        if(password !== confirm){
+            showAlert('Check if both passwords are the same', 'alerta-error')
+            return
+        }
         //fetch action
+        registerUser({
+            name,
+            email,
+            password
+        })
     }
 
 
     return (
         <div className="form-usuario">
+            {alert && ( <div className={`alerta ${alert.category}`}>{alert.msg}</div> ) }
             <div className="contenedor-form sombra-dark">
                 <h1>Create a new account</h1>
 

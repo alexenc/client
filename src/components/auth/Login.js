@@ -1,8 +1,26 @@
-import { useState } from "react"
+import { useContext, useState, useEffect } from "react"
 import { Link } from "react-router-dom"
+import AlertContext from "../../context/alerts/alertContext"
+import AuthContext from "../../context/auth/authContext"
 
-export default function Login() {
+export default function Login(props) {
 
+
+    const alertContext = useContext(AlertContext)
+    const {alert, showAlert } = alertContext
+
+    const authContext = useContext(AuthContext)
+    const {userLogIn, message, auth} = authContext
+
+
+    useEffect(() => {
+
+        if(auth){props.history.push('/projects')}
+
+        if(message){showAlert(message.msg, message.category)}
+        //eslint-disable-next-line
+        
+    }, [message, auth, ])
 
     //login state
 
@@ -26,13 +44,16 @@ export default function Login() {
         e.preventDefault()
 
         //validation
+        if(email.trim() === '' || password.trim() === '') {showAlert('All fields required', 'alerta-error')}
 
         //fetch action
+        userLogIn({email, password})
     }
 
 
     return (
         <div className="form-usuario">
+            {alert && <p className={`alerta ${alert.category}`}>{alert.msg}</p> }
             <div className="contenedor-form sombra-dark">
                 <h1>Log In</h1>
 

@@ -1,11 +1,18 @@
-
+import { useContext} from "react"
+import AuthContext from "../../context/auth/authContext"
 
 export default function Bar() {
+
+    const authContext = useContext(AuthContext)
+    const { user,  signOut} = authContext
+    
+
+
     return (
         <header className="app-header">
-            <p className="nombre-usuario">Hola <span>Alex</span></p>
-            <nav className="nav-pricipal">
-                <button className="btn-primario" href="#!">sign out</button>                
+            { user &&<p className="nombre-usuario">Hola <span>  {user.name} </span></p>}
+            <nav className="nav-pricipals">
+                <button onClick={() => signOut()}>Sign out</button>             
             </nav>
         </header>
     )
